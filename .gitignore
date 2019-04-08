@@ -23,7 +23,7 @@ coverage
 # Dependency directories
 node_modules/
 jspm_packages/
-config/
+config/*
 environ.env
 .env
 # Optional npm cache directory

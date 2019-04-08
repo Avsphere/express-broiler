@@ -1,31 +1,37 @@
 const path = require('path');
-const webpack = require('webpack')
-module.exports = {
-  entry: {
-    path: path.join(__dirname, 'src/js/main.js'),
-  },
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  output: {
-    path: path.resolve(__dirname, 'public/js'),
-    filename: 'main.js',
-  },
-  module: {
-    rules: [{
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: 'babel-loader'
-      },
-      {
-        test:/\.css$/,
-        use:['style-loader','css-loader']
-      }
+const webpack = require('webpack');
+let basePath = '/';
+module.exports = env => {
+  return {
+    /* no conflict is because while these look like duplicate imports they will be pulled into commons.bundle.js */
+    entry: {
+      path: path.join(__dirname, 'src/main.js'),
+    },
+    mode: env.NODE_ENV === 'production' ? 'production' : 'development',
+    output: {
+      path: path.resolve(__dirname, 'public/js'),
+      filename: "./[name].bundle.js"
+    },
+    devtool: env.NODE_ENV === 'production' ? false : 'source-map',
+    module: {
+      rules: [
+        {
+          test: /\.m?js$/,
+          exclude: /(node_modules)/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: ['@babel/preset-env']
+            }
+          }
+        }
+      ]
+    },
+    plugins: [
+      new webpack.DefinePlugin({
+        BASEPATH : JSON.stringify(basePath),
+        NODE_ENV : JSON.stringify(env.NODE_ENV),
+      })
     ]
-  },
-  plugins: [
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
-      Popper: ['popper.js', 'default']
-    })
-  ]
+}
 }
